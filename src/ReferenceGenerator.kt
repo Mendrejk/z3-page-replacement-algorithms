@@ -5,7 +5,7 @@ fun generateReferences(howMany: Int, process: Process, useLocality: Boolean): Li
         if (itProcess.isLocality) {
             itProcess.tickLocality()
             if (itProcess.isLocalityReferencesLeftZero()) itProcess.stopLocality()
-            itProcess.localitycurrentRange.random()
+            itProcess.localityCurrentRange.random()
         } else {
             if ((0..100).random() <= process.localityCurrentChance) process.startLocality()
             process.incrementLocalityChance()

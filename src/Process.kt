@@ -7,7 +7,7 @@ class Process(pageCount: Int) {
     var isLocality: Boolean = false
         private set
     private var localityReferencesLeft: Int = 0
-    var localitycurrentRange: IntRange = IntRange(0, 0)
+    var localityCurrentRange: IntRange = IntRange(0, 0)
         private set
     private val localityMinimalScope = LOCALITY_MINIMAL_SCOPE
     private val localityMaximalScope = LOCALITY_MAXIMAL_SCOPE
@@ -39,7 +39,7 @@ class Process(pageCount: Int) {
     private fun generateLocalityRange(): Unit {
         val rangeLength = generateLocalityScope()
         val rangeStartIndex = (0 until (pages.size - rangeLength)).random()
-        localitycurrentRange = pages[rangeStartIndex]..pages[rangeStartIndex + rangeLength]
+        localityCurrentRange = pages[rangeStartIndex]..pages[rangeStartIndex + rangeLength]
     }
 
     private fun generateLocalityLength(): Unit {
