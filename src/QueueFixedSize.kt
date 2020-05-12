@@ -8,11 +8,17 @@ class QueueFixedSize<T>(val capacity: Int) {
         if (queue.size < capacity) queue.add(element)
     }
     fun first(): T = queue.first()
+    fun get(index: Int): T = queue[index]
     fun isEmpty(): Boolean = queue.isEmpty()
+    fun isFull(): Boolean = queue.size == capacity
     fun removeFirst(): Unit {
         queue.removeFirst()
+    }
+    fun remove(index: Int): Unit {
+        queue.removeAt(index)
     }
     fun size(): Int = queue.size
 
     operator fun contains(element: T): Boolean = queue.contains(element)
+    fun toList(): List<T> = queue.toList()
 }
