@@ -4,4 +4,6 @@ fun main() {
     println("fifo: ${firstInFirstOut(references)}")
     println("opt: ${optimal(references)}")
     println("lru: ${leastRecentlyUsed(references)}")
+    println("random: ${random(references)}")
+    println("lru approximation: ${leastRecentyUsedApproximation(references)}")
 }

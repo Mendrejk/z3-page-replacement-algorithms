@@ -7,4 +7,4 @@ const val LOCALITY_MINIMAL_SCOPE = 2
 const val LOCALITY_MAXIMAL_SCOPE = 7
 const val LOCALITY_MINIMAL_LENGTH = 2
 const val LOCALITY_MAXIMAL_LENTH = 25
-const val OPTIMAL_FUTURE_VISIBILITY = REFERENCE_COUNT
+const val OPTIMAL_FUTURE_VISIBILITY = 200 // around 500 for most optimal results, 20 to be worse than LRU

@@ -8,8 +8,8 @@ fun firstInFirstOut(references: List<Int>): Int {
         if (reference !in frameQueue) {
             if (frameQueue.isFull()) {
                 frameQueue.removeFirst()
-                pageFaultCount++
             }
+            pageFaultCount++
             frameQueue.add(reference)
         }
     }
@@ -29,10 +29,10 @@ fun optimal(references: List<Int>): Int {
                 val nextReferences: List<Int> = frameQueue.toList().map { findNextReference(it, references, index) }
                         .filter { it > -1 }
                 // if there are no future references (list is empty), remove the oldest element
-                val lastestNextReferenceIndex: Int = nextReferences.withIndex().maxBy { it.value }?.index ?: 0
-                frameQueue.remove(lastestNextReferenceIndex)
-                pageFaultCount++
+                val lastNextReferenceIndex: Int = nextReferences.withIndex().maxBy { it.value }?.index ?: 0
+                frameQueue.removeAt(lastNextReferenceIndex)
             }
+            pageFaultCount++
             frameQueue.add(reference)
         }
     }
@@ -54,11 +54,47 @@ fun leastRecentlyUsed(references: List<Int>): Int {
                 // valid references to find leastRecentlyUsed from
                 val leastRecentlyUsed: Int = frameMap.minBy { it.value }!!.key
                 frameMap.remove(leastRecentlyUsed)
-                pageFaultCount++
             }
+            pageFaultCount++
         }
         // this either adds a new reference to the map, or refreshes it's last use
         frameMap[reference] = index
+    }
+    return pageFaultCount
+}
+
+fun random(references: List<Int>): Int {
+    // here a normal mutableList will sufice, as the removal of pages doesn't follow any order
+    val frameList: MutableList<Int> = mutableListOf<Int>()
+    val frameListCapacity = FRAME_COUNT
+    var pageFaultCount: Int = 0
+
+    references.forEach<Int> { reference: Int ->
+        if (reference !in frameList) {
+            if (frameList.size == frameListCapacity) {
+                frameList.removeAt((0..frameList.lastIndex).random())
+            }
+            pageFaultCount++
+            frameList.add(reference)
+        }
+    }
+    return pageFaultCount
+}
+
+// aka Second Chance Algorithm
+fun leastRecentyUsedApproximation(references: List<Int>): Int {
+    // a queue of pairs will be used, where the first element is the page reference and the second is it's second chance bit
+    val frameQueue: QueueOfPairsFixedSize<Int, Int> = QueueOfPairsFixedSize<Int, Int>(FRAME_COUNT)
+    var pageFaultCount: Int = 0
+
+    references.forEach<Int> { reference: Int ->
+        if (!frameQueue.containsByFirst(reference)) {
+            if (frameQueue.isFull()) {
+                while(frameQueue.isFull()) frameQueue.spareOrRemoveFirst()
+            }
+            pageFaultCount++
+            frameQueue.add(Pair(reference, 1))
+        } else frameQueue.giveSecondChance(reference)
     }
     return pageFaultCount
 }
@@ -71,3 +107,20 @@ private fun findNextReference(reference: Int, references: List<Int>, index: Int)
             references.last() == reference -> references.last()
             else -> -1
         }
+
+// these two are extension methods - a very fancy thing indeed
+// naming 101 x.x
+private fun QueueOfPairsFixedSize<Int, Int>.spareOrRemoveFirst(): Unit {
+    val first: Pair<Int, Int> = this.removeFirst()
+    if (first.second == 1) {
+        this.add(Pair(first.first, 0))
+    }
+}
+
+private fun QueueOfPairsFixedSize<Int, Int>.giveSecondChance(element: Int): Unit {
+    val candidate: Pair<Int, Int>? = this.getByFirst(element)
+    if (candidate != null) {
+        this.remove(candidate)
+        this.add(Pair(candidate.first, 1))
+    }
+}
