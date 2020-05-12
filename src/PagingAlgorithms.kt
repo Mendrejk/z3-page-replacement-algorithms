@@ -39,6 +39,30 @@ fun optimal(references: List<Int>): Int {
     return pageFaultCount
 }
 
+fun leastRecentlyUsed(references: List<Int>): Int {
+    // here we always remove the page that was least recently used (duh), so a queue is not necessary
+    // a map is used instead as it allows for easy storage of given pages' last-use-index
+    // no time to make a custom object, consider?
+    val frameMap: MutableMap<Int, Int> = mutableMapOf()
+    val frameMapCapacity = FRAME_COUNT
+    var pageFaultCount: Int = 0
+
+    references.withIndex().forEach() { (index : Int, reference: Int) ->
+        if (reference !in frameMap.keys) {
+            if (frameMap.size == frameMapCapacity) {
+                // here a not-null assertion is used (!! operator), as we know for sure that there will be
+                // valid references to find leastRecentlyUsed from
+                val leastRecentlyUsed: Int = frameMap.minBy { it.value }!!.key
+                frameMap.remove(leastRecentlyUsed)
+                pageFaultCount++
+            }
+        }
+        // this either adds a new reference to the map, or refreshes it's last use
+        frameMap[reference] = index
+    }
+    return pageFaultCount
+}
+
 private fun findNextReference(reference: Int, references: List<Int>, index: Int): Int =
         when {
             index + OPTIMAL_FUTURE_VISIBILITY < references.size ->
